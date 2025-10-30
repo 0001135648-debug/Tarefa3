@@ -12,6 +12,11 @@ function App() {
   const [novaTarefa, setNovaTarefa] = useState("");
   const [filtroHistorico, setFiltroHistorico] = useState("todas"); // filtro do histórico
 
+  // Controle de tema
+  const [isDarkMode, setIsDarkMode] = useState(
+    () => JSON.parse(localStorage.getItem("isDarkMode")) || false
+  );
+
   // Salvar no localStorage
   useEffect(
     () => localStorage.setItem("tarefas", JSON.stringify(tarefas)),
@@ -170,6 +175,13 @@ function App() {
             ))}
           </ul>
         )}
+      </div>
+
+      {/* Botão para alternar o tema */}
+      <div className="theme-toggle">
+        <button onClick={() => setIsDarkMode(!isDarkMode)}>
+          {isDarkMode ? "Modo Claro" : "Modo Escuro"}
+        </button>
       </div>
     </div>
   );

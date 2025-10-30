@@ -4,6 +4,20 @@
   margin: 0 auto;
   font-family: Arial, sans-serif;
   padding: 20px;
+  position: relative; /* Para poder posicionar o botão de tema dentro do app */
+  transition: background-color 0.3s, color 0.3s; /* Animação para a transição de tema */
+}
+
+/* Modo Claro (padrão) */
+body {
+  background-color: #ffffff;
+  color: #333;
+}
+
+/* Modo Escuro */
+body.dark-mode {
+  background-color: #333;
+  color: #f1f1f1;
 }
 
 /* Input de nova tarefa */
@@ -16,6 +30,15 @@
   flex: 1;
   padding: 10px;
   font-size: 16px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  color: #333;
+}
+
+.input-area input.dark-mode {
+  background-color: #444;
+  color: #f1f1f1;
+  border-color: #555;
 }
 
 .input-area button {
@@ -23,6 +46,23 @@
   margin-left: 10px;
   font-size: 16px;
   cursor: pointer;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.input-area button:hover {
+  background-color: #45a049;
+}
+
+.input-area button.dark-mode {
+  background-color: #555;
+  color: #f1f1f1;
+}
+
+.input-area button.dark-mode:hover {
+  background-color: #666;
 }
 
 /* Lista de filtros */
@@ -109,4 +149,33 @@
 
 .historico small {
   color: gray;
+}
+
+/* Botão de alternância de tema no canto superior direito */
+.theme-toggle {
+  position: absolute;
+  top: 20px; /* Distância do topo */
+  right: 20px; /* Distância da direita */
+  z-index: 10; /* Para garantir que o botão fique acima de outros elementos */
+}
+
+.theme-toggle button {
+  padding: 10px 20px;
+  background-color: #a2f897;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.theme-toggle button:hover {
+  background-color: #0fbb2c;
+}
+
+.theme-toggle button.dark-mode {
+  background-color: #555;
+  color: #f1f1f1;
+}
+
+.theme-toggle button.dark-mode:hover {
+  background-color: #666;
 }
