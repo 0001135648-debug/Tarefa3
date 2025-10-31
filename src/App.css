@@ -106,6 +106,7 @@ body.dark-mode {
 
 /* Tarefa concluída */
 .todo-item span.concluida {
+  text-decoration: line-through;
   color: gray;
 }
 
@@ -157,24 +158,42 @@ body.dark-mode {
   right: 20px; /* Distância da direita */
   z-index: 10; /* Para garantir que o botão fique acima de outros elementos */
 }
-
-.theme-toggle button {
-  padding: 10px 20px;
-  background-color: #a2f897;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+/* Tema Claro */
+.app.light-mode {
+  background-color: #f7f7f7;
+  color: #222;
 }
 
-.theme-toggle button:hover {
-  background-color: #0fbb2c;
-}
-
-.theme-toggle button.dark-mode {
-  background-color: #555;
+/* Tema Escuro */
+.app.dark-mode {
+  background-color: #1e1e1e;
   color: #f1f1f1;
 }
 
-.theme-toggle button.dark-mode:hover {
-  background-color: #666;
+/* Botão do tema */
+.theme-toggle {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.theme-toggle button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background-color: #61dafb;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.theme-toggle button:hover {
+  background-color: #21a1f1;
+}
+
+/* Ajuste geral */
+.app {
+  min-height: 100vh;
+  padding: 20px;
+  transition: background-color 0.3s, color 0.3s;
 }

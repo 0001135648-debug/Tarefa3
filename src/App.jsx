@@ -10,14 +10,19 @@ function App() {
     () => JSON.parse(localStorage.getItem("historico")) || []
   );
   const [novaTarefa, setNovaTarefa] = useState("");
-  const [filtroHistorico, setFiltroHistorico] = useState("todas"); // filtro do histórico
+  const [filtroHistorico, setFiltroHistorico] = useState("todas");
 
-  // Controle de tema
+  // 🌗 Controle de tema
   const [isDarkMode, setIsDarkMode] = useState(
     () => JSON.parse(localStorage.getItem("isDarkMode")) || false
   );
 
-  // Salvar no localStorage
+  // 🔄 Atualiza localStorage quando o tema muda
+  useEffect(() => {
+    localStorage.setItem("isDarkMode", JSON.stringify(isDarkMode));
+  }, [isDarkMode]);
+
+  // 💾 Salvar tarefas e histórico no localStorage
   useEffect(
     () => localStorage.setItem("tarefas", JSON.stringify(tarefas)),
     [tarefas]
@@ -27,7 +32,7 @@ function App() {
     [historico]
   );
 
-  // Funções de tarefas
+  // ➕ Adicionar tarefa
   const adicionarTarefa = () => {
     if (!novaTarefa.trim()) return;
     const nova = { id: Date.now(), texto: novaTarefa, concluida: false };
@@ -43,6 +48,7 @@ function App() {
     setNovaTarefa("");
   };
 
+  // ✅ Alternar conclusão
   const alternarConclusao = (id) => {
     setTarefas((prev) =>
       prev.map((t) => {
@@ -63,6 +69,7 @@ function App() {
     );
   };
 
+  // ❌ Remover tarefa
   const removerTarefa = (id) => {
     const tarefaRemovida = tarefas.find((t) => t.id === id);
     if (!tarefaRemovida) return;
@@ -77,6 +84,7 @@ function App() {
     ]);
   };
 
+  // ✏️ Editar tarefa
   const editarTarefa = (id, novoTexto) => {
     const tarefaAntiga = tarefas.find((t) => t.id === id);
     if (!tarefaAntiga) return;
@@ -93,22 +101,20 @@ function App() {
     ]);
   };
 
-  // Lista principal mostra todas as tarefas sem filtro
-  const tarefasFiltradas = tarefas;
-
-  // Filtragem do histórico
+  // 📋 Filtrar histórico
   const historicoFiltrado = historico.filter((h) => {
     if (filtroHistorico === "Concluída") return h.acao === "Concluída";
     if (filtroHistorico === "Pendente") return h.acao === "Pendente";
     if (filtroHistorico === "Removida") return h.acao === "Removida";
     if (filtroHistorico === "Adicionada") return h.acao === "Adicionada";
-    return true; // todas
+    return true;
   });
 
   return (
-    <div className="app">
+    <div className={`app ${isDarkMode ? "dark-mode" : "light-mode"}`}>
       <h1>📝 Lista de Tarefas</h1>
 
+      {/* Campo de entrada */}
       <div className="input-area">
         <input
           type="text"
@@ -119,9 +125,9 @@ function App() {
         <button onClick={adicionarTarefa}>Adicionar</button>
       </div>
 
-      {/* Lista principal */}
+      {/* Lista de tarefas */}
       <TodoList
-        tarefas={tarefasFiltradas}
+        tarefas={tarefas}
         onToggle={alternarConclusao}
         onRemover={removerTarefa}
         onEditar={editarTarefa}
@@ -131,36 +137,17 @@ function App() {
       <div className="historico">
         <h2>📜 Histórico de Ações</h2>
         <div className="filtros">
-          <button
-            onClick={() => setFiltroHistorico("todas")}
-            className={filtroHistorico === "todas" ? "ativo" : ""}
-          >
-            Todas
-          </button>
-          <button
-            onClick={() => setFiltroHistorico("Concluída")}
-            className={filtroHistorico === "Concluída" ? "ativo" : ""}
-          >
-            Concluídos
-          </button>
-          <button
-            onClick={() => setFiltroHistorico("Pendente")}
-            className={filtroHistorico === "Pendente" ? "ativo" : ""}
-          >
-            Pendentes
-          </button>
-          <button
-            onClick={() => setFiltroHistorico("Removida")}
-            className={filtroHistorico === "Removida" ? "ativo" : ""}
-          >
-            Removidos
-          </button>
-          <button
-            onClick={() => setFiltroHistorico("Adicionada")}
-            className={filtroHistorico === "Adicionada" ? "ativo" : ""}
-          >
-            Adicionados
-          </button>
+          {["todas", "Concluída", "Pendente", "Removida", "Adicionada"].map(
+            (filtro) => (
+              <button
+                key={filtro}
+                onClick={() => setFiltroHistorico(filtro)}
+                className={filtroHistorico === filtro ? "ativo" : ""}
+              >
+                {filtro === "todas" ? "Todas" : filtro + "s"}
+              </button>
+            )
+          )}
         </div>
 
         {historicoFiltrado.length === 0 ? (
@@ -177,10 +164,10 @@ function App() {
         )}
       </div>
 
-      {/* Botão para alternar o tema */}
+      {/* 🌗 Alternar tema */}
       <div className="theme-toggle">
         <button onClick={() => setIsDarkMode(!isDarkMode)}>
-          {isDarkMode ? "Modo Claro" : "Modo Escuro"}
+          {isDarkMode ? "☀️ Modo Claro" : "🌙 Modo Escuro"}
         </button>
       </div>
     </div>
