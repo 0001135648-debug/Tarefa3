@@ -106,7 +106,6 @@ body.dark-mode {
 
 /* Tarefa concluída */
 .todo-item span.concluida {
-  text-decoration: line-through;
   color: gray;
 }
 
