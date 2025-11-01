@@ -197,3 +197,27 @@ body.dark-mode {
   padding: 20px;
   transition: background-color 0.3s, color 0.3s;
 }
+
+#aviso {
+  display: none;
+  background-color: #ffcc00;
+  color: #222;
+  padding: 20px 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  font-size: 20px;
+  font-weight: bold;
+  animation: piscar 1s infinite;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+@keyframes piscar {
+  0%, 50%, 100% {
+    opacity: 1;
+  }
+  25%, 75% {
+    opacity: 0.4;
+  }
+}
+
