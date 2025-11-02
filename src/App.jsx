@@ -62,6 +62,27 @@ function App() {
               data: new Date().toLocaleString(),
             },
           ]);
+          // Efeitos quando a tarefa não for concluída (marcada como pendente)
+          if (!novaConcluida) {
+            // Efeito sonoro: tocar um som de alerta (assumindo que você tenha um arquivo de áudio em public/sounds/alert.mp3)
+            const audio = new Audio('/sounds/alert.mp3'); // Ajuste o caminho conforme necessário
+            audio.play().catch(e => console.log('Erro ao tocar som:', e)); // Trata erro se o som não puder ser tocado
+
+            // Efeito visual: adicionar uma classe temporária para animação (piscar por 2 segundos)
+            setTarefas((prevTarefas) =>
+              prevTarefas.map((task) =>
+                task.id === id ? { ...task, efeitoPendente: true } : task
+              )
+            );
+            // Remover o efeito após 2 segundos
+            setTimeout(() => {
+              setTarefas((prevTarefas) =>
+                prevTarefas.map((task) =>
+                  task.id === id ? { ...task, efeitoPendente: false } : task
+                )
+              );
+            }, 2000);
+          }
           return { ...t, concluida: novaConcluida };
         }
         return t;

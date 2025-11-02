@@ -151,6 +151,15 @@ body.dark-mode {
   color: gray;
 }
 
+.tarefa-pendente-efeito {
+  animation: piscar 0.5s infinite alternate;
+}
+
+@keyframes piscar {
+  0% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
 /* Botão de alternância de tema no canto superior direito */
 .theme-toggle {
   position: absolute;
