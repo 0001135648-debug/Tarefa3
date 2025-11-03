@@ -13,7 +13,7 @@ function TodoList({ tarefas, onToggle, onRemover, onEditar }) {
             tarefa={tarefa}
             onToggle={onToggle}
             onRemover={onRemover}
-            onEditar={onEditar} // Passamos a função de edição
+            onEditar={onEditar}
           />
         ))
       )}
