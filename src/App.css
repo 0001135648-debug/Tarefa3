@@ -174,14 +174,14 @@ body.dark-mode {
 
 /* Tema Claro */
 .app.light-mode {
-  background-color: #f7f7f7;
-  color: #222;
+  background-color: #f5f2f5;
+  color: #000000;
 }
 
 /* Tema Escuro */
 .app.dark-mode {
   background-color: #1e1e1e;
-  color: #f1f1f1;
+  color: #ffffff;
 }
 
 /* Botão do tema */

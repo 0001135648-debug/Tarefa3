@@ -30,7 +30,9 @@ function App() {
 
   useEffect(() => {
     if (Notification.permission !== "granted") {
-      Notification.requestPermission();
+      Notification.requestPermission().then((permission) => {
+        console.log("Permissão de notificação:", permission);
+      });
     }
   }, []);
 
@@ -44,6 +46,8 @@ function App() {
       scheduledTime: dataAgendada || null,
       notified: false,
       efeitoPendente: false,
+      addedTime: Date.now(),
+      reminderNotified: false,
     };
 
     setTarefas((prev) => [...prev, nova]);
@@ -59,6 +63,10 @@ function App() {
 
     setNovaTarefa("");
     setDataAgendada("");
+
+    // 🔊 Som de nova tarefa adicionada
+    const audio = new Audio("/sons/notificacao.mp3");
+    audio.play().catch((err) => console.warn("Erro ao tocar som:", err));
   };
 
   const alternarConclusao = (id) => {
@@ -76,13 +84,15 @@ function App() {
             },
           ]);
 
+          // 🔊 Som de conclusão de tarefa
+          const audio = new Audio("/sons/notificacao.mp3");
+          audio.play().catch((err) => console.warn("Erro ao tocar som:", err));
+
           if (!novaConcluida) {
             setTimeout(() => {
               setTarefas((prevTarefas) =>
                 prevTarefas.map((task) =>
-                  task.id === id
-                    ? { ...task, efeitoPendente: false }
-                    : task
+                  task.id === id ? { ...task, efeitoPendente: false } : task
                 )
               );
             }, 2000);
@@ -111,6 +121,10 @@ function App() {
         data: new Date().toLocaleString(),
       },
     ]);
+
+    // 🔊 Som de remoção
+    const audio = new Audio("/sons/notificacao.mp3");
+    audio.play().catch((err) => console.warn("Erro ao tocar som:", err));
   };
 
   const editarTarefa = (id, novoTexto) => {
@@ -129,13 +143,42 @@ function App() {
         data: new Date().toLocaleString(),
       },
     ]);
+
+    // 🔊 Som de edição
+    const audio = new Audio("/sons/notificacao.mp3");
+    audio.play().catch((err) => console.warn("Erro ao tocar som:", err));
   };
 
+  // 🔁 Sistema de lembretes e notificações com som
   useEffect(() => {
     const interval = setInterval(() => {
+      console.log("Verificando lembretes...");
       setTarefas((prevTarefas) =>
         prevTarefas.map((t) => {
           const agora = new Date();
+          const addedTime = t.addedTime || Date.now();
+          const tempoDecorrido = agora - new Date(addedTime);
+
+          if (
+            !t.concluida &&
+            !t.reminderNotified &&
+            tempoDecorrido >= 300000 // 5 minutos
+          ) {
+            console.log("Disparando lembrete para:", t.texto);
+            if (Notification.permission === "granted") {
+              new Notification("⏰ Lembrete de tarefa pendente!", {
+                body: `Há 5 minutos você adicionou: "${t.texto}". Ainda não concluiu?`,
+              });
+
+              // 🔊 Som de lembrete
+              const audio = new Audio("/sons/notificacao.mp3");
+              audio
+                .play()
+                .catch((err) => console.warn("Erro ao tocar som:", err));
+            }
+            return { ...t, reminderNotified: true };
+          }
+
           if (
             t.scheduledTime &&
             !t.concluida &&
@@ -145,15 +188,20 @@ function App() {
             if (Notification.permission === "granted") {
               new Notification("⏰ Tarefa pendente!", {
                 body: `Você ainda não concluiu: ${t.texto}`,
-                icon: "/icon.png",
               });
+
+              // 🔊 Som de tarefa agendada
+              const audio = new Audio("/sons/notificacao.mp3");
+              audio
+                .play()
+                .catch((err) => console.warn("Erro ao tocar som:", err));
             }
             return { ...t, notified: true };
           }
           return t;
         })
       );
-    }, 60000);
+    }, 10000); // 10 segundos para teste (pode ajustar depois)
 
     return () => clearInterval(interval);
   }, []);

@@ -44,15 +44,14 @@ function TodoItem({ tarefa, onToggle, onRemover, onEditar }) {
       )}
 
       <button onClick={() => onRemover(tarefa.id)}>Remover</button>
-    </div>
-  );
-}
 
-{
-  tarefa.scheduledTime && (
-    <small className="data-agendada">
-      ⏰ {new Date(tarefa.scheduledTime).toLocaleString()}
-    </small>
+      {/* Data agendada integrada ao JSX */}
+      {tarefa.scheduledTime && (
+        <small className="data-agendada">
+          ⏰ {new Date(tarefa.scheduledTime).toLocaleString()}
+        </small>
+      )}
+    </div>
   );
 }
 
