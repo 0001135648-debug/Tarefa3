@@ -48,4 +48,12 @@ function TodoItem({ tarefa, onToggle, onRemover, onEditar }) {
   );
 }
 
+{
+  tarefa.scheduledTime && (
+    <small className="data-agendada">
+      ⏰ {new Date(tarefa.scheduledTime).toLocaleString()}
+    </small>
+  );
+}
+
 export default TodoItem;

@@ -10,93 +10,101 @@ function App() {
     () => JSON.parse(localStorage.getItem("historico")) || []
   );
   const [novaTarefa, setNovaTarefa] = useState("");
+  const [dataAgendada, setDataAgendada] = useState("");
   const [filtroHistorico, setFiltroHistorico] = useState("todas");
-
-  // 🌗 Controle de tema
   const [isDarkMode, setIsDarkMode] = useState(
     () => JSON.parse(localStorage.getItem("isDarkMode")) || false
   );
 
-  // 🔄 Atualiza localStorage quando o tema muda
   useEffect(() => {
     localStorage.setItem("isDarkMode", JSON.stringify(isDarkMode));
   }, [isDarkMode]);
 
-  // 💾 Salvar tarefas e histórico no localStorage
-  useEffect(
-    () => localStorage.setItem("tarefas", JSON.stringify(tarefas)),
-    [tarefas]
-  );
-  useEffect(
-    () => localStorage.setItem("historico", JSON.stringify(historico)),
-    [historico]
-  );
+  useEffect(() => {
+    localStorage.setItem("tarefas", JSON.stringify(tarefas));
+  }, [tarefas]);
 
-  // ➕ Adicionar tarefa
+  useEffect(() => {
+    localStorage.setItem("historico", JSON.stringify(historico));
+  }, [historico]);
+
+  useEffect(() => {
+    if (Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
+  }, []);
+
   const adicionarTarefa = () => {
     if (!novaTarefa.trim()) return;
-    const nova = { id: Date.now(), texto: novaTarefa, concluida: false };
-    setTarefas([...tarefas, nova]);
-    setHistorico([
-      ...historico,
+
+    const nova = {
+      id: Date.now(),
+      texto: novaTarefa,
+      concluida: false,
+      scheduledTime: dataAgendada || null,
+      notified: false,
+      efeitoPendente: false,
+    };
+
+    setTarefas((prev) => [...prev, nova]);
+
+    setHistorico((prev) => [
+      ...prev,
       {
         acao: "Adicionada",
         texto: novaTarefa,
         data: new Date().toLocaleString(),
       },
     ]);
+
     setNovaTarefa("");
+    setDataAgendada("");
   };
 
-  // ✅ Alternar conclusão
   const alternarConclusao = (id) => {
     setTarefas((prev) =>
       prev.map((t) => {
         if (t.id === id) {
           const novaConcluida = !t.concluida;
-          setHistorico([
-            ...historico,
+
+          setHistorico((prevHist) => [
+            ...prevHist,
             {
               acao: novaConcluida ? "Concluída" : "Pendente",
               texto: t.texto,
               data: new Date().toLocaleString(),
             },
           ]);
-          // Efeitos quando a tarefa não for concluída (marcada como pendente)
-          if (!novaConcluida) {
-            // Efeito sonoro: tocar um som de alerta (assumindo que você tenha um arquivo de áudio em public/sounds/alert.mp3)
-            const audio = new Audio('/sounds/alert.mp3'); // Ajuste o caminho conforme necessário
-            audio.play().catch(e => console.log('Erro ao tocar som:', e)); // Trata erro se o som não puder ser tocado
 
-            // Efeito visual: adicionar uma classe temporária para animação (piscar por 2 segundos)
-            setTarefas((prevTarefas) =>
-              prevTarefas.map((task) =>
-                task.id === id ? { ...task, efeitoPendente: true } : task
-              )
-            );
-            // Remover o efeito após 2 segundos
+          if (!novaConcluida) {
             setTimeout(() => {
               setTarefas((prevTarefas) =>
                 prevTarefas.map((task) =>
-                  task.id === id ? { ...task, efeitoPendente: false } : task
+                  task.id === id
+                    ? { ...task, efeitoPendente: false }
+                    : task
                 )
               );
             }, 2000);
+
+            return { ...t, concluida: novaConcluida, efeitoPendente: true };
           }
-          return { ...t, concluida: novaConcluida };
+
+          return { ...t, concluida: novaConcluida, efeitoPendente: false };
         }
         return t;
       })
     );
   };
 
-  // ❌ Remover tarefa
   const removerTarefa = (id) => {
     const tarefaRemovida = tarefas.find((t) => t.id === id);
     if (!tarefaRemovida) return;
-    setTarefas(tarefas.filter((t) => t.id !== id));
-    setHistorico([
-      ...historico,
+
+    setTarefas((prev) => prev.filter((t) => t.id !== id));
+
+    setHistorico((prev) => [
+      ...prev,
       {
         acao: "Removida",
         texto: tarefaRemovida.texto,
@@ -105,15 +113,16 @@ function App() {
     ]);
   };
 
-  // ✏️ Editar tarefa
   const editarTarefa = (id, novoTexto) => {
     const tarefaAntiga = tarefas.find((t) => t.id === id);
     if (!tarefaAntiga) return;
-    setTarefas(
-      tarefas.map((t) => (t.id === id ? { ...t, texto: novoTexto } : t))
+
+    setTarefas((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, texto: novoTexto } : t))
     );
-    setHistorico([
-      ...historico,
+
+    setHistorico((prev) => [
+      ...prev,
       {
         acao: "Editada",
         texto: `${tarefaAntiga.texto} → ${novoTexto}`,
@@ -122,7 +131,33 @@ function App() {
     ]);
   };
 
-  // 📋 Filtrar histórico
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTarefas((prevTarefas) =>
+        prevTarefas.map((t) => {
+          const agora = new Date();
+          if (
+            t.scheduledTime &&
+            !t.concluida &&
+            !t.notified &&
+            new Date(t.scheduledTime) <= agora
+          ) {
+            if (Notification.permission === "granted") {
+              new Notification("⏰ Tarefa pendente!", {
+                body: `Você ainda não concluiu: ${t.texto}`,
+                icon: "/icon.png",
+              });
+            }
+            return { ...t, notified: true };
+          }
+          return t;
+        })
+      );
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const historicoFiltrado = historico.filter((h) => {
     if (filtroHistorico === "Concluída") return h.acao === "Concluída";
     if (filtroHistorico === "Pendente") return h.acao === "Pendente";
@@ -135,7 +170,6 @@ function App() {
     <div className={`app ${isDarkMode ? "dark-mode" : "light-mode"}`}>
       <h1>📝 Lista de Tarefas</h1>
 
-      {/* Campo de entrada */}
       <div className="input-area">
         <input
           type="text"
@@ -143,10 +177,16 @@ function App() {
           value={novaTarefa}
           onChange={(e) => setNovaTarefa(e.target.value)}
         />
+
+        <input
+          type="datetime-local"
+          value={dataAgendada}
+          onChange={(e) => setDataAgendada(e.target.value)}
+        />
+
         <button onClick={adicionarTarefa}>Adicionar</button>
       </div>
 
-      {/* Lista de tarefas */}
       <TodoList
         tarefas={tarefas}
         onToggle={alternarConclusao}
@@ -154,7 +194,6 @@ function App() {
         onEditar={editarTarefa}
       />
 
-      {/* Histórico filtrável */}
       <div className="historico">
         <h2>📜 Histórico de Ações</h2>
         <div className="filtros">
@@ -185,7 +224,6 @@ function App() {
         )}
       </div>
 
-      {/* 🌗 Alternar tema */}
       <div className="theme-toggle">
         <button onClick={() => setIsDarkMode(!isDarkMode)}>
           {isDarkMode ? "☀️ Modo Claro" : "🌙 Modo Escuro"}

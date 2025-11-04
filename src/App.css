@@ -156,8 +156,12 @@ body.dark-mode {
 }
 
 @keyframes piscar {
-  0% { opacity: 1; }
-  100% { opacity: 0.5; }
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.5;
+  }
 }
 
 /* Botão de alternância de tema no canto superior direito */
@@ -167,6 +171,7 @@ body.dark-mode {
   right: 20px; /* Distância da direita */
   z-index: 10; /* Para garantir que o botão fique acima de outros elementos */
 }
+
 /* Tema Claro */
 .app.light-mode {
   background-color: #f7f7f7;
@@ -222,11 +227,13 @@ body.dark-mode {
 }
 
 @keyframes piscar {
-  0%, 50%, 100% {
+  0%,
+  50%,
+  100% {
     opacity: 1;
   }
-  25%, 75% {
+  25%,
+  75% {
     opacity: 0.4;
   }
 }
-
