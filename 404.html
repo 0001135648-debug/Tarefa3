@@ -4,14 +4,24 @@
     <meta charset="UTF-8" />
     <title>Redirecionando...</title>
     <script>
-      // Pega a rota atual
-      const path = window.location.pathname;
+      (function() {
+        // Pega o caminho da URL
+        const path = window.location.pathname;
 
-      // Se não estiver na raiz e não for arquivo estático
-      if (path !== '/' && !path.includes('.')) {
-        // Redireciona para index.html mantendo a rota
-        window.location.href = '/Tarefa3/' + path.substring(1);
-      }
+        // Nome do repositório (substitua se mudar)
+        const repoName = '/Tarefa3/';
+
+        // Se não estiver na raiz e não for arquivo estático
+        if (path !== repoName && !path.includes('.')) {
+          // Remove a barra inicial
+          const relativePath = path.startsWith(repoName)
+            ? path.slice(repoName.length)
+            : path.slice(1);
+
+          // Redireciona para index.html mantendo a rota
+          window.location.href = repoName + '#' + relativePath;
+        }
+      })();
     </script>
   </head>
   <body>
