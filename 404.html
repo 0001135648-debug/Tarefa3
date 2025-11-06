@@ -2,15 +2,19 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="refresh" content="0; URL=./" />
+    <title>Redirecionando...</title>
     <script>
-      // Redireciona todas as rotas para index.html
+      // Pega a rota atual
       const path = window.location.pathname;
+
+      // Se não estiver na raiz e não for arquivo estático
       if (path !== '/' && !path.includes('.')) {
-        window.location.href = '/Tarefa3/';
+        // Redireciona para index.html mantendo a rota
+        window.location.href = '/Tarefa3/' + path.substring(1);
       }
     </script>
-    <title>Redirecionando...</title>
   </head>
-  <body></body>
+  <body>
+    <p>Redirecionando...</p>
+  </body>
 </html>
